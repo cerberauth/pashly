@@ -147,6 +147,46 @@ func TestInfoDetectsBcrypt(t *testing.T) {
 	assert.Contains(t, infoOut, "cost: 4")
 }
 
+func TestVerifyLegacyFormats(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		hash     string
+		password string
+	}{
+		{"md5-crypt", "$1$saltsalt$//251epTQaKpm7/bnAD.Z.", "mypassword"},
+		{"phpass", "$P$616oJgEUyLNuWon9U5H4XwjiWXpPji/", "correct horse battery staple"},
+		{"sha256-crypt", "$5$saltstring$5B8vYYiY.CVt1RlTTf8KbXBH3hsxY/GNooZaBBGWEc5", "Hello world!"},
+		{
+			"sha512-crypt",
+			"$6$saltstring$svn8UoSVapNtMuq1ukKS4tPQd8iKwSMHWjl/O817G3uBnIFNjnQJuesI68u4OTLiBFdcbYEdFCoEOfaS35inz1",
+			"Hello world!",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			_, _, code := run(t, "verify", "--hash", tc.hash, "--password", tc.password)
+			assert.Equal(t, 0, code)
+
+			_, _, code = run(t, "verify", "--hash", tc.hash, "--password", "wrong password")
+			assert.Equal(t, 1, code)
+
+			infoOut, _, code := run(t, "info", tc.hash)
+			require.Equal(t, 0, code)
+			assert.Contains(t, infoOut, "algorithm: "+tc.name)
+			assert.Contains(t, infoOut, "legacy")
+		})
+	}
+}
+
+func TestHashRejectsLegacyAlgorithms(t *testing.T) {
+	for _, id := range []string{"md5-crypt", "phpass", "sha256-crypt", "sha512-crypt"} {
+		t.Run(id, func(t *testing.T) {
+			_, stderr, code := run(t, "hash", "--password", "x", "-a", id)
+			assert.Equal(t, 2, code)
+			assert.Contains(t, stderr, "verify/info only")
+		})
+	}
+}
+
 func TestPasswordInputMutualExclusivity(t *testing.T) {
 	_, stderr, code := run(t, "hash", "--password", "x", "--stdin")
 	assert.Equal(t, 2, code)

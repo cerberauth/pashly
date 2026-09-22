@@ -16,6 +16,8 @@ const (
 	IDPbkdf2Sha512 = "pbkdf2-sha512"
 	IDPhpass       = "phpass"
 	IDMD5Crypt     = "md5-crypt"
+	IDSha256Crypt  = "sha256-crypt"
+	IDSha512Crypt  = "sha512-crypt"
 )
 
 // Hash function names used by pbkdf2's variants.
