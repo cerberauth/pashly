@@ -88,9 +88,10 @@ pashly verify --hash-file ./user.hash --password-file ./attempt.txt
 
 Exit codes are scriptable: `0` = match, `1` = no match, `2` = error (bad
 input, unparsable hash). Algorithm/target auto-detection covers pashly's
-own canonical formats, bcrypt, legacy md5-crypt/phpass, and every
-`--target` platform's native encoding; override with `--algorithm` (an
-algorithm ID like `bcrypt`, or a target name like `auth0`) if needed.
+own canonical formats, bcrypt, legacy md5-crypt/sha256-crypt/sha512-crypt/
+phpass, and every `--target` platform's native encoding; override with
+`--algorithm` (an algorithm ID like `bcrypt`, or a target name like
+`auth0`) if needed.
 
 #### Migration-flavored: verifying an exported hash during a cutover
 
@@ -129,6 +130,8 @@ store is actually using before planning a migration.
 | `pbkdf2-sha512` | yes | yes | PHC-style, passlib convention |
 | `pbkdf2-sha1` | yes | yes | legacy interop only; never the default |
 | `md5-crypt` | no | yes | legacy (`$1$`); verify/info only |
+| `sha256-crypt` | no | yes | legacy (`$5$`); verify/info only |
+| `sha512-crypt` | no | yes | legacy (`$6$`); verify/info only |
 | `phpass` | no | yes | legacy (`$P$`/`$H$`); verify/info only |
 
 ## `--target` platforms
@@ -141,9 +144,9 @@ store is actually using before planning a migration.
 - `verify` uses a constant-time comparison of the derived key.
 - Default parameters follow the current OWASP Password Storage Cheat
   Sheet.
-- Legacy formats (`md5-crypt`, `phpass`, `pbkdf2-sha1`) exist for
-  migrating *away from* older systems — pashly will never produce them as
-  a `hash` target.
+- Legacy formats (`md5-crypt`, `sha256-crypt`, `sha512-crypt`, `phpass`,
+  `pbkdf2-sha1`) exist for migrating *away from* older systems — pashly
+  will never produce them as a `hash` target.
 
 ## Development
 

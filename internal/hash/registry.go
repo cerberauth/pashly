@@ -13,6 +13,8 @@ var registryOrder = []string{
 	IDPbkdf2Sha1,
 	IDPhpass,
 	IDMD5Crypt,
+	IDSha256Crypt,
+	IDSha512Crypt,
 }
 
 var registry = map[string]Algorithm{
@@ -25,6 +27,8 @@ var registry = map[string]Algorithm{
 	IDPbkdf2Sha512: pbkdf2Algorithm{hashName: HashSHA512},
 	IDMD5Crypt:     md5CryptAlgorithm{},
 	IDPhpass:       phpassAlgorithm{},
+	IDSha256Crypt:  newSha256CryptAlgorithm(),
+	IDSha512Crypt:  newSha512CryptAlgorithm(),
 }
 
 // Get returns the Algorithm registered under id.

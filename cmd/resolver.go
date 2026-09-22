@@ -15,18 +15,17 @@ type resolvedHash struct {
 	label  string // algorithm ID, or "target:<name>" for target formats
 	result hash.Result
 	algo   hash.Algorithm
+
+	// canonical is the string to hand to algo.Verify. For a directly
+	// detected/forced algorithm it's the original input, already in that
+	// algorithm's own format. For a --target format it's re-encoded from
+	// result into the underlying algorithm's canonical form, since the
+	// target's native string isn't understood by algo.Verify.
+	canonical string
 }
 
 func (r resolvedHash) verify(password []byte) (bool, error) {
-	canonical := string(r.result.Key)
-	if r.algo.ID() != "bcrypt" {
-		var err error
-		canonical, err = r.algo.Encode(r.result)
-		if err != nil {
-			return false, err
-		}
-	}
-	return r.algo.Verify(password, canonical)
+	return r.algo.Verify(password, r.canonical)
 }
 
 // resolveHash detects (or, if override is non-empty, forces) the
@@ -40,7 +39,7 @@ func resolveHash(encoded, override string) (resolvedHash, error) {
 			if err != nil {
 				return resolvedHash{}, fmt.Errorf("decoding as %s: %w", override, err)
 			}
-			return resolvedHash{label: override, result: result, algo: algo}, nil
+			return resolvedHash{label: override, result: result, algo: algo, canonical: encoded}, nil
 		}
 		if adapter, err := target.Get(override); err == nil {
 			return resolveViaTarget(adapter, encoded)
@@ -53,7 +52,7 @@ func resolveHash(encoded, override string) (resolvedHash, error) {
 		if err != nil {
 			return resolvedHash{}, err
 		}
-		return resolvedHash{label: algo.ID(), result: result, algo: algo}, nil
+		return resolvedHash{label: algo.ID(), result: result, algo: algo, canonical: encoded}, nil
 	}
 
 	if adapter := sniffTarget(encoded); adapter != nil {
@@ -72,7 +71,11 @@ func resolveViaTarget(adapter target.Adapter, encoded string) (resolvedHash, err
 	if err != nil {
 		return resolvedHash{}, err
 	}
-	return resolvedHash{label: "target:" + adapter.Name(), result: result, algo: algo}, nil
+	canonical, err := algo.Encode(result)
+	if err != nil {
+		return resolvedHash{}, err
+	}
+	return resolvedHash{label: "target:" + adapter.Name(), result: result, algo: algo, canonical: canonical}, nil
 }
 
 // sniffTarget makes a best-effort guess at which --target format encoded

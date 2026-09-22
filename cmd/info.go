@@ -40,6 +40,8 @@ var encodingLabel = map[string]string{
 	hash.IDPbkdf2Sha512: encodingPHCPassslib,
 	hash.IDMD5Crypt:     "legacy md5crypt ($1$)",
 	hash.IDPhpass:       "legacy phpass portable hash ($P$/$H$)",
+	hash.IDSha256Crypt:  "legacy sha256-crypt ($5$)",
+	hash.IDSha512Crypt:  "legacy sha512-crypt ($6$)",
 }
 
 func printInfo(label, algorithmID string, r hash.Result, format string) error {
@@ -90,7 +92,7 @@ func paramsToMap(algorithmID string, p hash.Params) map[string]any {
 		out["parallelism"] = p.Parallelism
 	case hash.IDPbkdf2Sha1, hash.IDPbkdf2Sha256, hash.IDPbkdf2Sha512:
 		out["iterations"] = p.Iterations
-	case hash.IDPhpass:
+	case hash.IDPhpass, hash.IDSha256Crypt, hash.IDSha512Crypt:
 		out["iterations"] = p.Iterations
 	}
 	if p.SaltLength > 0 {
