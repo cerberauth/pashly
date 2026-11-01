@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cerberauth/pashly/internal/hash"
 	"github.com/cerberauth/pashly/internal/target"
+	"github.com/cerberauth/x/telemetryx"
 	"github.com/spf13/cobra"
 )
 
@@ -48,10 +50,12 @@ var hashCmd = &cobra.Command{
 			algorithmID = adapter.AlgorithmID()
 			params := fillMissingParams(paramsForAlgorithm(algorithmID, rawParams()), adapter.DefaultParams())
 
+			hashStart := time.Now()
 			result, err := adapter.Hash(password, params)
 			if err != nil {
 				return err
 			}
+			telemetryx.Duration(cmd.Context(), "hash.run", time.Since(hashStart), telemetryx.Vocab(algorithmID, hash.IDs()...))
 			if encoded, err = adapter.Encode(result); err != nil {
 				return err
 			}
@@ -69,10 +73,12 @@ var hashCmd = &cobra.Command{
 			}
 			params := fillMissingParams(paramsForAlgorithm(algorithmID, rawParams()), algo.DefaultParams())
 
+			hashStart := time.Now()
 			result, err := algo.Hash(password, params)
 			if err != nil {
 				return err
 			}
+			telemetryx.Duration(cmd.Context(), "hash.run", time.Since(hashStart), telemetryx.Vocab(algorithmID, hash.IDs()...))
 			if encoded, err = algo.Encode(result); err != nil {
 				return err
 			}
