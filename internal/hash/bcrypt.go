@@ -9,7 +9,7 @@ import (
 )
 
 // bcryptRE matches bcrypt's own native encoding, e.g. $2a$12$<22-char
-// salt><31-char hash>. $2b$/$2y$ are legacy prefixes accepted on decode.
+// salt><31-char hash>. $2b$ and $2y$ encodings are also accepted on decode.
 var bcryptRE = regexp.MustCompile(`^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$`)
 
 // bcryptDefaultCost follows the current OWASP Password Storage Cheat Sheet
