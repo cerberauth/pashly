@@ -19,13 +19,6 @@ const (
 	ambiguous = "il1Lo0O|"
 )
 
-// Charset selects which character classes generated passwords draw from.
-type Charset struct {
-	// Custom, when non-empty, is used verbatim instead of a named preset.
-	Custom      string
-	NoAmbiguous bool
-}
-
 // Alphabet returns the resolved, de-duplicated set of characters a
 // password may be drawn from for the given preset name
 // ("alnum" | "alnum-symbols" | "custom:...").
