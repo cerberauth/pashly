@@ -28,9 +28,9 @@ func NewRootCmd(projectVersion, commit, date string) *cobra.Command {
 		Version: projectVersion + " (commit=" + commit + ", built=" + date + ")",
 		Short:   "Password generation, hashing, and verification CLI",
 		Long: `Pashly generates passwords, hashes them with configurable parameters, and
-verifies passwords against hashes — built to support IAM/CIAM migration work
-(moving user stores between systems like Auth0, Okta, Keycloak, and
-Duende IdentityServer).`,
+verifies passwords against hashes — built to support IAM/CIAM migration
+work (moving user stores between systems like Auth0, Okta, Keycloak,
+Django, WordPress, ASP.NET Identity, and Duende IdentityServer).`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

@@ -8,8 +8,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// bcryptRE matches bcrypt's own native encoding, e.g. $2b$12$<22-char
-// salt><31-char hash>. $2a$/$2y$ are legacy prefixes accepted on decode.
+// bcryptRE matches bcrypt's own native encoding, e.g. $2a$12$<22-char
+// salt><31-char hash>. $2b$ and $2y$ encodings are also accepted on decode.
 var bcryptRE = regexp.MustCompile(`^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$`)
 
 // bcryptDefaultCost follows the current OWASP Password Storage Cheat Sheet
@@ -26,7 +26,7 @@ func (bcryptAlgorithm) DefaultParams() Params {
 }
 
 // Hash delegates entirely to golang.org/x/crypto/bcrypt, which owns salt
-// generation and produces its own native $2b$ string; pashly does not
+// generation and produces its own native $2a$ string; pashly does not
 // re-encode bcrypt output.
 func (b bcryptAlgorithm) Hash(password []byte, params Params) (Result, error) {
 	cost := params.Cost
