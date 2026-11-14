@@ -10,11 +10,14 @@ const (
 	// highest, OWASP's pbkdf2-sha1 recommendation, is 1.3M).
 	MaxPBKDF2Iterations = 100_000_000
 
-	// scryptMaxMemoryBytes caps scrypt's 128*r*N working memory (4 GiB).
-	scryptMaxMemoryBytes = 4 << 30
 	// scryptMaxLn bounds log2(N) before computing 1<<ln.
 	scryptMaxLn = 32
 )
+
+// scryptMaxMemoryBytes caps scrypt's 128*r*N working memory (4 GiB). It is
+// typed as uint64 because an untyped constant of this size overflows int on
+// 32-bit targets when passed to fmt.Errorf.
+const scryptMaxMemoryBytes uint64 = 4 << 30
 
 // ValidatePBKDF2Iterations rejects zero, negative or excessive PBKDF2
 // iteration counts.
